@@ -1,25 +1,37 @@
 import pandas as pd
 import sys
+import os
 import re
 import genanki
 
 # open the file and read through it line by line
-fh = open(sys.argv[1]).read()
-# latex_header = open("header.tex").read()
+fh = sys.argv[1]
+header = open("header.tex").read()
 
 questions = []
 
-def extractQuestions(fileName):
+def extractQuestions(path):
     """
     extractQuestions - Extracts problems from a given CLP file.
 
     Parameter: fileName - the name of the file to use
     Returns: a pandas dataframe with the questions and soutions
     """
+
+    fh = open(path).read()
     contents = re.split(r"\\begin{M?question}", fh)
+
+    file_name = os.path.basename(path)
+
+    section = re.search(r"prob_s(?P<section>.*)\.tex", file_name)
 
     for i in contents:
         questions_dict = {}
+
+        i = re.sub(r"\\begin{center}", r"", i)
+        i = re.sub(r"\\end{center}", r"", i)
+        # Verify
+        i = re.sub(r"~\\eref{.*?}{.*?}", r"\\textbf{?}", i)
 
         prompt = re.search(r"(\[(?P<exam>.*?)\])?(\\label{(?P<label>[^\s]*)})?[\n\s](?P<prompt>[\s\S]*?)\n\\end{(?P<representative>M)?question}", i, re.S)
         
@@ -31,16 +43,19 @@ def extractQuestions(fileName):
                 representative_str = "Yes"
             else:
                 representative_str = "No"
+            section_str = section.group("section")
         else:
             prompt_str = None
             exam_str = None
             label_str = None
             representative_str = None
+            section_str = None
 
         questions_dict["question"] = prompt_str
         questions_dict["exam"] = exam_str
         questions_dict["label"] = label_str
         questions_dict["representative"] = representative_str
+        questions_dict["section"] = section_str
 
         hint = re.search(r"\\begin{hint}(?P<hint>.*?)\\end{hint}", i, re.S)
         if hint is not None:
@@ -86,15 +101,20 @@ def makeAnki(questionsFrame, deckName):
         'CLP-2 Question',
         fields = [
             {'name': 'Question'},
+            {'name': 'Hint'},
+            {'name': 'Answer'},
             {'name': 'Solution'},
         ],
         templates = [
             {
                 'name': 'Card 1',
-                'qfmt': '{{Question}}',
-                'afmt': '{{FrontSide}}<hr id="solution">{{Solution}}',
+                'qfmt': '{{Question}}\n{{hint::Hint}}',
+                'afmt': '{{FrontSide}}<hr id="solution">{{Answer}}\n{{hint::Solution}}',
             },
-        ])
+        ],
+        latex_header = header)
+
+    genanki.Model()
 
     question_deck = genanki.Deck(
         1211025408,
@@ -102,19 +122,17 @@ def makeAnki(questionsFrame, deckName):
     )
 
     for i in range(len(questionsFrame)):
-        print(questionsFrame.loc[i]["question"])
 
         if questionsFrame.loc[i]["question"] is not None:
             question_notes.append(genanki.Note(
                 model = question_model,
-                fields = [questionsFrame.loc[i]["question"], questionsFrame.loc[i]["solution"]]))
+                fields = [questionsFrame.loc[i]["question"], questionsFrame.loc[i]["hint"], questionsFrame.loc[i]["answer"], questionsFrame.loc[i]["solution"]],
+                tags = [questionsFrame.loc[i]["section"]]))
 
     for i in range(len(question_notes)):
         question_deck.add_note(question_notes[i])
 
-
     genanki.Package(question_deck).write_to_file('output.apkg')
 
 questionsDF = extractQuestions(fh)
-print(questionsDF["solution"])
 makeAnki(questionsDF, "Test")
