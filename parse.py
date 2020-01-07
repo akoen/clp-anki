@@ -30,8 +30,9 @@ def extractQuestions(path):
 
         i = re.sub(r"\\begin{center}", r"", i)
         i = re.sub(r"\\end{center}", r"", i)
-        # Verify
-        i = re.sub(r"~\\eref{.*?}{.*?}", r"\\textbf{?}", i)
+
+        # References do not work. They are replaced with a bold question mark.
+        i = re.sub(r"~?\\eref{.*?}{.*?}", r"\\textbf{?}", i)
 
         prompt = re.search(r"(\[(?P<exam>.*?)\])?(\\label{(?P<label>[^\s]*)})?[\n\s](?P<prompt>[\s\S]*?)\n\\end{(?P<representative>M)?question}", i, re.S)
         
