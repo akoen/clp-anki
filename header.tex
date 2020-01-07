@@ -3,7 +3,7 @@
 % This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 % https://creativecommons.org/licenses/by-nc-sa/4.0/
 %
-\documentclass[varwidth, border=1px]{standalone}
+\documentclass[varwidth, margin=20pt]{standalone}
 \usepackage{graphicx}
 
 \usepackage{amsmath,amsfonts, amssymb, mathtools, mathabx, multirow}
@@ -47,7 +47,6 @@
 \newcommand{\Procedural}{Stage~2}
 \newcommand{\Application}{Stage~3}
 \newcommand{\Instructions}[1]{{\small\textit{#1}}}
-
 
 \newcommand{\YEaxis}[2]{\draw[help lines, <->] (-#1,0)--(#1,0) node[right]{$x$};
 \draw[help lines, <->] (0,-#2)--(0,#2) node[above]{$y$};}
@@ -100,6 +99,5 @@ node[right]{$t$};
 \draw (2,.75) node[right]{$#3$};
 \draw (.6,1.1) node[rotate=30]{$#4$};
 \end{tikzpicture}}
-
 
 \begin{document}
