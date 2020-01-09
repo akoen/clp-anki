@@ -1,5 +1,5 @@
 import pandas as pd
-import sys
+import getopt, sys
 import os
 import re
 import genanki
@@ -8,9 +8,7 @@ import genanki
 fh = sys.argv[1]
 header = open("header.tex").read()
 
-questions = []
-
-def extractQuestions(path):
+def extractQuestions(path, question_filter=None):
     """
     extractQuestions - Extracts problems from a given CLP file.
 
@@ -19,13 +17,21 @@ def extractQuestions(path):
     """
 
     fh = open(path).read()
-    contents = re.split(r"\\begin{M?question}", fh)
+    contents = re.split(r"[^%]\\begin{M?question}", fh)
+    contents.pop(0)
 
     file_name = os.path.basename(path)
 
     section = re.search(r"prob_s(?P<section>.*)\.tex", file_name)
 
+    questions = []
+
     for i in contents:
+
+        # Discard question if it does not satisfy the filter
+        if question_filter is not None and question_filter not in i:
+            continue
+
         questions_dict = {}
 
         i = re.sub(r"\\begin{center}", r"", i)
@@ -46,11 +52,11 @@ def extractQuestions(path):
                 representative_str = "No"
             section_str = section.group("section")
         else:
-            prompt_str = None
-            exam_str = None
-            label_str = None
-            representative_str = None
-            section_str = None
+            prompt_str = ""
+            exam_str = ""
+            label_str = ""
+            representative_str = ""
+            section_str = ""
 
         questions_dict["question"] = prompt_str
         questions_dict["exam"] = exam_str
@@ -62,7 +68,7 @@ def extractQuestions(path):
         if hint is not None:
             hint_str = '[latex]' + hint.group("hint") + '[/latex]'
         else:
-            hint_str = None
+            hint_str = ""
 
         questions_dict["hint"] = hint_str
 
@@ -70,7 +76,7 @@ def extractQuestions(path):
         if answer is not None:
             answer_str = '[latex]' + answer.group("answer") + '[/latex]'
         else:
-            answer_str = None
+            answer_str = ""
 
         questions_dict["answer"] = answer_str
 
@@ -78,9 +84,11 @@ def extractQuestions(path):
         if solution is not None:
             solution_str = '[latex]' + solution.group("solution") + '[/latex]'
         else:
-            solution_str = None
+            solution_str = ""
 
         questions_dict["solution"] = solution_str
+        if questions_dict["question"] == None:
+            print("A question could not be parsed in section " + section.group("section"))
 
         questions.append(questions_dict)
 
@@ -99,7 +107,7 @@ def makeAnki(questionsFrame, deckName):
 
     question_model = genanki.Model(
         1831615823,
-        'CLP-2 Question',
+        'CLP Question',
         fields = [
             {'name': 'Question'},
             {'name': 'Hint'},
@@ -109,7 +117,7 @@ def makeAnki(questionsFrame, deckName):
         templates = [
             {
                 'name': 'Card 1',
-                'qfmt': '{{Question}}\n{{hint::Hint}}',
+                'qfmt': '{{Tags}}<br><br>\n{{Question}}\n{{hint::Hint}}',
                 'afmt': '{{FrontSide}}<hr id="solution">{{Answer}}\n{{hint::Solution}}',
             },
         ],
@@ -129,11 +137,10 @@ def makeAnki(questionsFrame, deckName):
                 model = question_model,
                 fields = [questionsFrame.loc[i]["question"], questionsFrame.loc[i]["hint"], questionsFrame.loc[i]["answer"], questionsFrame.loc[i]["solution"]],
                 tags = [questionsFrame.loc[i]["section"]]))
+        else:
+            print("Error, empty question. Skipping...")
 
     for i in range(len(question_notes)):
         question_deck.add_note(question_notes[i])
 
     genanki.Package(question_deck).write_to_file('output.apkg')
-
-questionsDF = extractQuestions(fh)
-makeAnki(questionsDF, "Test")
