@@ -143,4 +143,4 @@ def makeAnki(questionsFrame, deckName):
     for i in range(len(question_notes)):
         question_deck.add_note(question_notes[i])
 
-    genanki.Package(question_deck).write_to_file('output.apkg')
+    genanki.Package(question_deck).write_to_file('clp-output.apkg')
