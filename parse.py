@@ -40,6 +40,8 @@ def extractQuestions(path, question_filter=None):
         # References do not work. They are replaced with a bold question mark.
         i = re.sub(r"~?\\eref{.*?}{.*?}", r"\\textbf{?}", i)
 
+        # TODO Substitute \includegraphics
+
         prompt = re.search(r"(\[(?P<exam>.*?)\])?(\\label{(?P<label>[^\s]*)})?[\n\s](?P<prompt>[\s\S]*?)\n\\end{(?P<representative>M)?question}", i, re.S)
         
         if prompt is not None:
