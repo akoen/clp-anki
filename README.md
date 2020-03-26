@@ -1,5 +1,14 @@
 # Anki CLP
 
+
+## Get Anki to build the cards
+
+Install [pdf2svg](https://github.com/dawbarton/pdf2svg) and [LibRSVG](https://wiki.gnome.org/Projects/LibRsvg) using your package manager of choice to build LaTeX as svg.
+
+Install [Edit LaTeX build process](https://ankiweb.net/shared/info/937148547) from AnkiWeb.
+
+Copy the following to the configuration of `Edit LaTeX build process` under `Tools->Add-Ons`.
+
 ```
 {
     "pngCommands": [
