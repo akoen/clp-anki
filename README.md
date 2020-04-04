@@ -11,6 +11,7 @@ This is a tool I built in January 2020 to automate my studying in math courses. 
 
 For example, if you .tex files are in the `problem-files/` directory, run
 `python ./genclp.py -v -r problems/*`to generate an Anki deck from *only* the representative questions (those marked in blue).
+
 3. Options: 
     - '-r' generate only cards for representative questions.
     - '-v' verbose output (recommended).
@@ -26,11 +27,11 @@ For example, if you .tex files are in the `problem-files/` directory, run
 
 ### Known bugs
 - References do not work and will show up as **??** in cards. Unfortunately, there is nothing that can be done about this.
-- A few cards important external images and will fail to build. This is being worked on.
+- A small number of cards import external images and will fail to build. This is being worked on.
 
 ## Installation
 
-Unfortunately, it is rather... complex to run this script since much massaging must be performed to get Anki to cooperate. This should be everything that's needed to get this set up on Linux, but if you encounter any difficulties feel free to submit an issue or contact me at [my website](alexkoen.com).
+Unfortunately, it is rather... complex to run this script since much massaging must be performed to get Anki to cooperate. This should be everything that's needed to get this set up on Linux, but if you encounter any difficulties feel free to submit an issue or contact me at [my website](https://www.alexkoen.com).
 
 ### Install the macros
 
