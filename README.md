@@ -1,6 +1,6 @@
 # Anki CLP
 
-This is a tool I built in January 2020 to automate my studying in math courses. It parses the questions from any UBC CLP Textbook to generate [Anki](https://en.wikipedia.org/wiki/Anki_(software)) cards. Admittedly, there's a lot of trickery that goes into making this work and setting it up may be challenging. However, this script has dramatically improved my test scores while reducing the amount of time I spend studying.
+This is a tool I built in January 2020 to automate my studying in math courses. It parses the questions from any UBC CLP textbook to generate [Anki](https://en.wikipedia.org/wiki/Anki_(software)) cards. Admittedly, there's a lot of trickery that goes into making this work and setting it up may be challenging. However, this script has dramatically improved my test scores while reducing the amount of time I spend studying.
 
 ![](example.gif)
 
@@ -18,7 +18,7 @@ For example, if you .tex files are in the `problem-files/` directory, run
     - '-c' generate a .csv file instead of an Anki deck (requires a filename).
 
 3. Import the `clp-output.apkg` file into Anki.
-4. In Anki under `Tolls -> Manage Note Types -> CLP Question -> Options` select `Create scalable images with dvisvgm`.
+4. In Anki under `Tools -> Manage Note Types -> CLP Question -> Options` select `Create scalable images with dvisvgm`.
 
 ## Features
 
