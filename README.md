@@ -1,6 +1,8 @@
 # Anki CLP
 
-This is a tool I built in January 2020 to automate my studying in math courses. It parses the questions from any UBC CLP textbook to generate [Anki](https://en.wikipedia.org/wiki/Anki_(software)) cards. Admittedly, there's a lot of trickery that goes into making this work and setting it up may be challenging. However, this script has dramatically improved my test scores while reducing the amount of time I spend studying.
+This is a tool I built in January 2020 to improve my efficiency when studying for math courses. It parses the questions from any UBC CLP textbook to generate [Anki](https://en.wikipedia.org/wiki/Anki_(software)) flashcards. It then makes use of the Anki spaced repetition algorithm to intelligently present you with practice questions based on your prior performance. 
+
+Admittedly, there's a lot of trickery that goes into making this work and consequently setting it up may be challenging. However, this script has dramatically improved my test scores while reducing the amount of time that I spend studying.
 
 ![](example.gif)
 
