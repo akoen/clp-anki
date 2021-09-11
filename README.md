@@ -9,6 +9,7 @@ Admittedly, there's a lot of trickery that goes into making this work and conseq
 ## Usage
 
 1. Download the [source files](http://www.math.ubc.ca/~CLP/src/) for your CLP of choice.
+2. Run `pip install genanki pandas`
 2. Run `python ./genclp.py <target files>` where `<target-files>` corresponds to the problem book .tex files of choice.
 
 For example, if you .tex files are in the `problem-files/` directory, run
@@ -98,5 +99,7 @@ Test your installation by running `kpsewhich clpmacros.sty`. If successful, it w
     ]
 }
 ```
+
+Your cards should now render beautifully in Anki.
 
 Again, don't hesitate to let me know if you need any help.

@@ -13,88 +13,98 @@ def extractQuestions(path, question_filter=None):
     extractQuestions - Extracts problems from a given CLP file.
 
     Parameter: fileName - the name of the file to use
-    Returns: a pandas dataframe with the questions and soutions
+    Returns: a pandas dataframe with the questions and solutions
     """
 
-    fh = open(path).read()
-    contents = re.split(r"[^%]\\begin{M?question}", fh)
-    contents.pop(0)
+    with open(path) as f:
+        fh = f.read()
+        file_name = os.path.basename(path)
+        file_section = re.search(r"prob_s(?P<section>.*)\.tex", file_name)
 
-    file_name = os.path.basename(path)
+        raw_data_list = re.split(r"[^%]\\begin{M?question}", fh)
+        raw_data_list.pop(0) # Discard pre-amble
 
-    section = re.search(r"prob_s(?P<section>.*)\.tex", file_name)
+        questions_list = []
 
-    questions = []
+        difficulty = "Conceptual"
+        for i in raw_data_list:
+            questions_dict = {}
+            questions_dict["Difficulty"] = difficulty
+            if "Procedural" in i:
+                difficulty = "Procedural"
 
-    for i in contents:
+            if "Application" in i:
+                difficulty = "Application"
 
-        # Discard question if it does not satisfy the filter
-        if question_filter is not None and question_filter not in i:
-            continue
+            # Discard question if it does not satisfy the filter
+            if question_filter is not None and question_filter not in i:
+                continue
 
-        questions_dict = {}
+            i = re.sub(r"\\begin{center}", r"", i)
+            i = re.sub(r"\\end{center}", r"", i)
 
-        i = re.sub(r"\\begin{center}", r"", i)
-        i = re.sub(r"\\end{center}", r"", i)
+            # References do not work. They are replaced with a bold question mark.
+            i = re.sub(r"~?\\eref{.*?}{.*?}", r"\\textbf{?}", i)
 
-        # References do not work. They are replaced with a bold question mark.
-        i = re.sub(r"~?\\eref{.*?}{.*?}", r"\\textbf{?}", i)
+            i = re.sub(r"\\includegraphics{(.*?).pdf}", r"\\includegraphics[scale=0.6]{\1}", i)
 
-        # TODO Substitute \includegraphics
+            # HACK
 
-        prompt = re.search(r"(\[(?P<exam>.*?)\])?(\\label{(?P<label>[^\s]*)})?[\n\s](?P<prompt>[\s\S]*?)\n\\end{(?P<representative>M)?question}", i, re.S)
-        
-        if prompt is not None:
-            prompt_str = '[latex]' + prompt.group("prompt") + '[/latex]'
-            exam_str = prompt.group("exam")
-            label_str = prompt.group("label")
-            if prompt.group("representative") == "M":
-                representative_str = "Yes"
+            i = re.sub(r"%", r" ", i)
+
+            prompt = re.search(r"(\[(?P<exam>.*?)\])?(\\label{(?P<label>[^\s]*)})?[\n\s](?P<prompt>[\s\S]*?)\n\\end{(?P<representative>M)?question}", i, re.S)
+
+            if prompt is not None:
+                prompt_str = '[latex]' + prompt.group("prompt") + '[/latex]'
+                exam_str = prompt.group("exam")
+                label_str = prompt.group("label")
+                if prompt.group("representative") == "M":
+                    representative_str = "Yes"
+                else:
+                    representative_str = "No"
+                section_str = file_section.group("section")
             else:
-                representative_str = "No"
-            section_str = section.group("section")
-        else:
-            prompt_str = ""
-            exam_str = ""
-            label_str = ""
-            representative_str = ""
-            section_str = ""
+                prompt_str = ""
+                exam_str = ""
+                label_str = ""
+                representative_str = ""
+                section_str = ""
 
-        questions_dict["question"] = prompt_str
-        questions_dict["exam"] = exam_str
-        questions_dict["label"] = label_str
-        questions_dict["representative"] = representative_str
-        questions_dict["section"] = section_str
+            questions_dict["question"] = prompt_str
+            questions_dict["exam"] = exam_str
+            questions_dict["label"] = label_str
+            questions_dict["representative"] = representative_str
+            questions_dict["section"] = section_str
 
-        hint = re.search(r"\\begin{hint}(?P<hint>.*?)\\end{hint}", i, re.S)
-        if hint is not None:
-            hint_str = '[latex]' + hint.group("hint") + '[/latex]'
-        else:
-            hint_str = ""
+            hint = re.search(r"\\begin{hint}(?P<hint>.*?)\\end{hint}", i, re.S)
+            if hint is not None:
+                hint_str = '[latex]' + hint.group("hint") + '[/latex]'
+            else:
+                hint_str = ""
 
-        questions_dict["hint"] = hint_str
+            questions_dict["hint"] = hint_str
 
-        answer = re.search(r"\\begin{answer}[\n\s](?P<answer>.*?)\\end{answer}", i, re.S)
-        if answer is not None:
-            answer_str = '[latex]' + answer.group("answer") + '[/latex]'
-        else:
-            answer_str = ""
+            answer = re.search(r"\\begin{answer}[\n\s](?P<answer>.*?)\\end{answer}", i, re.S)
+            if answer is not None:
+                answer_str = '[latex]' + answer.group("answer") + '[/latex]'
+            else:
+                answer_str = ""
 
-        questions_dict["answer"] = answer_str
+            questions_dict["answer"] = answer_str
 
-        solution = re.search(r"\\begin{solution}[\n\s](?P<solution>.*?)\\end{solution}", i, re.S)
-        if solution is not None:
-            solution_str = '[latex]' + solution.group("solution") + '[/latex]'
-        else:
-            solution_str = ""
+            solution = re.search(r"\\begin{solution}[\n\s](?P<solution>.*?)\\end{solution}", i, re.S)
+            if solution is not None:
+                solution_str = '[latex]' + solution.group("solution") + '[/latex]'
+            else:
+                solution_str = ""
 
-        questions_dict["solution"] = solution_str
-        if questions_dict["question"] == None:
-            print("A question could not be parsed in section " + section.group("section"))
+            questions_dict["solution"] = solution_str
+            if questions_dict["question"] == None:
+                print("A question could not be parsed in section " + file_section.group("section"))
 
-        questions.append(questions_dict)
+            questions_list.append(questions_dict)
 
-    questionsDF = pd.DataFrame(questions)
+    questionsDF = pd.DataFrame(questions_list)
     return questionsDF
 
 def makeAnki(questionsFrame, deckName):
