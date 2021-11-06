@@ -30,7 +30,7 @@ For example, if you .tex files are in the `problem-files/` directory, run
 
 ### Known bugs
 - References do not work and will show up as **??** in cards. Unfortunately, there is nothing that can be done about this.
-- A small number of cards import external images and will fail to build. This is being worked on.
+- A small number of cards that import external images and will fail to build. This is being worked on.
 
 ## Installation
 
@@ -103,3 +103,18 @@ Test your installation by running `kpsewhich clpmacros.sty`. If successful, it w
 Your cards should now render beautifully in Anki.
 
 Again, don't hesitate to let me know if you need any help.
+
+## A note from a brave soldier
+
+> Hello there! Thank you so much for the script - I'm a first year in Science and I really appreciate how much time this saved me.
+
+> This isn't an issue with your software at all, but might be worth putting a note in the README about (or not!).
+> I run Arch Linux with texlive-core installed, which I suspect is a more minimal installation than what's expected in the instructions, so I had to install a couple other packages to get things to compile in Anki.
+
+> 1. Installed texlive-latexextra from the AUR to get standalone.cls working.
+> 2. Installed tllocalmgr-git from the AUR to get tllocalmgr to install other packages.
+> 3. Ran tllocalmgr install mathabx to get mathabx.sty working.
+
+> The rest of the instructions worked very well - again, thank you for your work :)
+
+I'm just impressed that someone actually got this to work.
